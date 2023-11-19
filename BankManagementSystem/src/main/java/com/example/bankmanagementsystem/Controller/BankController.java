@@ -23,7 +23,7 @@ public class BankController {
 }
 
 @PutMapping("/update/{index}")
-    public ApiResponse updateAccount(@PathVariable int index, @RequestBody BankSystem account){
+    public ApiResponse updateAccount(@PathVariable int index, BankSystem account){
     bankAccounts.set(index,account);
     return new ApiResponse("Account updated",200);}
 
@@ -33,34 +33,20 @@ public class BankController {
         return new ApiResponse("Account Removed",200);
     }
 
-    @PutMapping("/deposit")
-    public ApiResponse deposit(@RequestBody BankSystem account){
-        for (BankSystem bankAccount : bankAccounts) {
-            if (account.getId().equals(bankAccount.getId())) {
-                if (account.getUserName().equals(bankAccount.getUserName())) {
-                    bankAccount.setBalance(bankAccount.getBalance() + account.getBalance());
-                    return new ApiResponse("Amount: " + account.getBalance() + " deposited from account successfully", 200);
-                }
-            } else continue;
-        }
-        return new ApiResponse("Invalid id or username",400);
+    @PutMapping("/deposit/{index}/{amount}")
+    public ApiResponse deposit(@PathVariable int index,@PathVariable double amount){
+    bankAccounts.get(index).setBalance(amount+bankAccounts.get(index).getBalance());
+        return new ApiResponse("Amount deposited successfully",200);
     }
 
 
-    @PutMapping("/withdraw")
-    public ApiResponse withdraw(@RequestBody BankSystem account){
-        for (BankSystem bankAccount : bankAccounts) {
-            if (account.getId().equals(bankAccount.getId())) {
-                if (account.getUserName().equals(bankAccount.getUserName())) {
-                    if (account.getBalance() <= bankAccount.getBalance() && account.getBalance() > 0) {
-                        bankAccount.setBalance(bankAccount.getBalance() - account.getBalance());
-                        return new ApiResponse("Amount: " + account.getBalance() + " withdrawn from account successfully", 200);
-                    }
-                }
-            }
-            else continue;
+    @PutMapping("/withdraw/{index}/{amount}")
+    public ApiResponse withdraw(@PathVariable int index,@PathVariable double amount){
+        if (amount <= bankAccounts.get(index).getBalance() && amount > 0) {
+            bankAccounts.get(index).setBalance(bankAccounts.get(index).getBalance()-amount);
+            return new ApiResponse("Amount withdrawn successfully",200);
         }
-        return new ApiResponse("Invalid id or username",400);
+        return new ApiResponse("Faild to withdraw from account",400);
     }
 
 
